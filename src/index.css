@@ -17,6 +17,38 @@ body {
   font-family: "Poppins", system-ui, sans-serif;
   background: #f8fafc;
   color: #0f172a;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button, a, input, select, textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: #0f172a;
+  color: #fff;
+}
+
+.shadow-premium {
+  box-shadow: 0 18px 55px rgba(15, 23, 42, 0.10);
+}
+
+.glass-nav {
+  transition: background .25s ease, box-shadow .25s ease;
+}
+
+.hero-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 75% 25%, rgba(245, 158, 11, .16), transparent 30%), linear-gradient(to bottom, transparent 70%, rgba(15,23,42,.25));
+}
+
+.hero-bg > * {
+  position: relative;
+  z-index: 1;
 }
 
 .glass-nav {
@@ -26,6 +58,8 @@ body {
 }
 
 .hero-bg {
+  position: relative;
+  overflow: hidden;
   background-image:
     linear-gradient(105deg, rgba(15, 23, 42, 0.92), rgba(15, 23, 42, 0.54), rgba(37, 99, 235, 0.18)),
     url("https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1800&q=85");

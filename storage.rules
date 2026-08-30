@@ -1,14 +1,8 @@
 rules_version = '2';
-
 service firebase.storage {
   match /b/{bucket}/o {
-    function isAdmin() {
-      return request.auth != null && request.auth.token.email == "admin@chandrakala.com";
-    }
-
-    match /products/{fileName} {
-      allow read: if true;
-      allow write: if isAdmin();
-    }
+    function isAdmin() { return request.auth != null && request.auth.token.email == 'admin@chandrakala.com'; }
+    match /products/{allPaths=**} { allow read: if true; allow write, delete: if isAdmin(); }
+    match /gallery/{allPaths=**} { allow read: if true; allow write, delete: if isAdmin(); }
   }
 }

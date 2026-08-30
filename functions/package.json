@@ -1,0 +1,6 @@
+{
+  "name":"chandrakala-functions",
+  "private":true,
+  "engines":{"node":"20"},
+  "dependencies":{"firebase-admin":"^13.0.0","firebase-functions":"^6.0.0","razorpay":"^2.9.5"}
+}

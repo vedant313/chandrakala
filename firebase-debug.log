@@ -1,0 +1,84 @@
+[debug] [2026-06-28T10:08:32.998Z] ----------------------------------------------------------------------
+[debug] [2026-06-28T10:08:33.022Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\vedant\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy --only firestore:rules --project chandrakala-bd6f8
+[debug] [2026-06-28T10:08:33.023Z] CLI Version:   15.22.1
+[debug] [2026-06-28T10:08:33.023Z] Platform:      win32
+[debug] [2026-06-28T10:08:33.023Z] Node Version:  v24.16.0
+[debug] [2026-06-28T10:08:33.023Z] Detected Agent: codex_cli
+[debug] [2026-06-28T10:08:33.024Z] Time:          Sun Jun 28 2026 15:38:33 GMT+0530 (India Standard Time)
+[debug] [2026-06-28T10:08:33.024Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-06-28T10:08:33.027Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2026-06-28T10:08:43.292Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-06-28T10:08:43.294Z] > authorizing via signed-in user (vedantb150@gmail.com)
+[debug] [2026-06-28T10:08:43.294Z] [iam] checking project chandrakala-bd6f8 for permissions ["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]
+[debug] [2026-06-28T10:08:43.296Z] Checked if tokens are valid: false, expires at: 1782270153694
+[debug] [2026-06-28T10:08:43.296Z] Checked if tokens are valid: false, expires at: 1782270153694
+[debug] [2026-06-28T10:08:43.297Z] > refreshing access token with scopes: []
+[debug] [2026-06-28T10:08:43.301Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-06-28T10:08:43.302Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-06-28T10:08:43.657Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2026-06-28T10:08:43.657Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-06-28T10:08:43.676Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/chandrakala-bd6f8:testIamPermissions [none]
+[debug] [2026-06-28T10:08:43.676Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/chandrakala-bd6f8:testIamPermissions  x-goog-user-project=chandrakala-bd6f8
+[debug] [2026-06-28T10:08:43.676Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/chandrakala-bd6f8:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]}
+[debug] [2026-06-28T10:08:43.999Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200
+[debug] [2026-06-28T10:08:43.999Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json {"cloudBuildErrorAfter":1594252800000,"cloudBuildWarnAfter":1590019200000,"defaultNode10After":1594252800000,"minVersion":"3.0.5","node8DeploysDisabledAfter":1613390400000,"node8RuntimeDisabledAfter":1615809600000,"node8WarnAfter":1600128000000}
+[debug] [2026-06-28T10:08:45.813Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/chandrakala-bd6f8:testIamPermissions 200
+[debug] [2026-06-28T10:08:45.814Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/chandrakala-bd6f8:testIamPermissions {"permissions":["datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]}
+[info] 
+[info] === Deploying to 'chandrakala-bd6f8'...
+[info] 
+[info] i  deploying firestore 
+[info] i  firestore: ensuring required API firestore.googleapis.com is enabled... 
+[debug] [2026-06-28T10:08:45.817Z] Checked if tokens are valid: true, expires at: 1782644922658
+[debug] [2026-06-28T10:08:45.817Z] Checked if tokens are valid: true, expires at: 1782644922658
+[debug] [2026-06-28T10:08:45.817Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/chandrakala-bd6f8/services/firestore.googleapis.com [none]
+[debug] [2026-06-28T10:08:45.817Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/chandrakala-bd6f8/services/firestore.googleapis.com  x-goog-user-project=chandrakala-bd6f8
+[debug] [2026-06-28T10:08:48.087Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/chandrakala-bd6f8/services/firestore.googleapis.com 200
+[debug] [2026-06-28T10:08:48.088Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/chandrakala-bd6f8/services/firestore.googleapis.com [omitted]
+[info] +  firestore: required API firestore.googleapis.com is enabled 
+[info] i  firestore: ensuring required API firestore.googleapis.com is enabled... 
+[debug] [2026-06-28T10:08:48.097Z] Checked if tokens are valid: true, expires at: 1782644922658
+[debug] [2026-06-28T10:08:48.097Z] Checked if tokens are valid: true, expires at: 1782644922658
+[debug] [2026-06-28T10:08:48.098Z] >>> [apiv2][query] GET https://firestore.googleapis.com/v1/projects/chandrakala-bd6f8/databases/(default) [none]
+[debug] [2026-06-28T10:08:49.558Z] <<< [apiv2][status] GET https://firestore.googleapis.com/v1/projects/chandrakala-bd6f8/databases/(default) 200
+[debug] [2026-06-28T10:08:49.558Z] <<< [apiv2][body] GET https://firestore.googleapis.com/v1/projects/chandrakala-bd6f8/databases/(default) {"name":"projects/chandrakala-bd6f8/databases/(default)","uid":"de369a50-fdf1-44ef-943c-81d768802f53","createTime":"2026-06-24T02:46:39.132596Z","updateTime":"2026-06-24T02:46:39.132596Z","locationId":"asia-south1","type":"FIRESTORE_NATIVE","concurrencyMode":"PESSIMISTIC","versionRetentionPeriod":"3600s","earliestVersionTime":"2026-06-28T09:08:49.048450Z","appEngineIntegrationMode":"DISABLED","keyPrefix":"j","pointInTimeRecoveryEnablement":"POINT_IN_TIME_RECOVERY_DISABLED","deleteProtectionState":"DELETE_PROTECTION_DISABLED","databaseEdition":"STANDARD","freeTier":true,"realtimeUpdatesMode":"REALTIME_UPDATES_MODE_ENABLED","etag":"INGRuLnYqZUDMJHUocjunpUD"}
+[info] i  cloud.firestore: checking firestore.rules for compilation errors... 
+[debug] [2026-06-28T10:08:49.559Z] Checked if tokens are valid: true, expires at: 1782644922658
+[debug] [2026-06-28T10:08:49.560Z] Checked if tokens are valid: true, expires at: 1782644922658
+[debug] [2026-06-28T10:08:49.560Z] >>> [apiv2][query] POST https://firebaserules.googleapis.com/v1/projects/chandrakala-bd6f8:test [none]
+[debug] [2026-06-28T10:08:49.560Z] >>> [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/chandrakala-bd6f8:test [omitted]
+[debug] [2026-06-28T10:08:51.334Z] <<< [apiv2][status] POST https://firebaserules.googleapis.com/v1/projects/chandrakala-bd6f8:test 200
+[debug] [2026-06-28T10:08:51.334Z] <<< [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/chandrakala-bd6f8:test {}
+[info] +  cloud.firestore: rules file firestore.rules compiled successfully 
+[debug] [2026-06-28T10:08:51.335Z] Checked if tokens are valid: true, expires at: 1782644922658
+[debug] [2026-06-28T10:08:51.336Z] Checked if tokens are valid: true, expires at: 1782644922658
+[debug] [2026-06-28T10:08:51.392Z] >>> [apiv2][query] GET https://firebaserules.googleapis.com/v1/projects/chandrakala-bd6f8/releases pageSize=10&pageToken=
+[debug] [2026-06-28T10:08:52.879Z] <<< [apiv2][status] GET https://firebaserules.googleapis.com/v1/projects/chandrakala-bd6f8/releases 200
+[debug] [2026-06-28T10:08:52.879Z] <<< [apiv2][body] GET https://firebaserules.googleapis.com/v1/projects/chandrakala-bd6f8/releases {"releases":[{"name":"projects/chandrakala-bd6f8/releases/cloud.firestore","rulesetName":"projects/chandrakala-bd6f8/rulesets/193da7fd-ce64-46af-affc-41ecb21b6087","createTime":"2026-06-24T02:46:45.470249Z","updateTime":"2026-06-28T08:25:36.368433Z"}]}
+[debug] [2026-06-28T10:08:52.879Z] Checked if tokens are valid: true, expires at: 1782644922658
+[debug] [2026-06-28T10:08:52.879Z] Checked if tokens are valid: true, expires at: 1782644922658
+[debug] [2026-06-28T10:08:52.880Z] >>> [apiv2][query] GET https://firebaserules.googleapis.com/v1/projects/chandrakala-bd6f8/rulesets/193da7fd-ce64-46af-affc-41ecb21b6087 [none]
+[debug] [2026-06-28T10:08:54.245Z] <<< [apiv2][status] GET https://firebaserules.googleapis.com/v1/projects/chandrakala-bd6f8/rulesets/193da7fd-ce64-46af-affc-41ecb21b6087 200
+[debug] [2026-06-28T10:08:54.245Z] <<< [apiv2][body] GET https://firebaserules.googleapis.com/v1/projects/chandrakala-bd6f8/rulesets/193da7fd-ce64-46af-affc-41ecb21b6087 [omitted]
+[info] i  firestore: uploading rules firestore.rules... 
+[debug] [2026-06-28T10:08:54.247Z] Checked if tokens are valid: true, expires at: 1782644922658
+[debug] [2026-06-28T10:08:54.247Z] Checked if tokens are valid: true, expires at: 1782644922658
+[debug] [2026-06-28T10:08:54.247Z] >>> [apiv2][query] POST https://firebaserules.googleapis.com/v1/projects/chandrakala-bd6f8/rulesets [none]
+[debug] [2026-06-28T10:08:54.247Z] >>> [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/chandrakala-bd6f8/rulesets [omitted]
+[debug] [2026-06-28T10:08:54.970Z] <<< [apiv2][status] POST https://firebaserules.googleapis.com/v1/projects/chandrakala-bd6f8/rulesets 200
+[debug] [2026-06-28T10:08:54.970Z] <<< [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/chandrakala-bd6f8/rulesets {"name":"projects/chandrakala-bd6f8/rulesets/d4acbff7-f8c5-4e80-bf90-f9274122b290","source":{"files":[{"content":"rules_version = '2';\n\nservice cloud.firestore {\n  match /databases/{database}/documents {\n    function signedIn() {\n      return request.auth != null;\n    }\n\n    function isAdmin() {\n      return signedIn() && request.auth.token.email == \"admin@chandrakala.com\";\n    }\n\n    match /products/{productId} {\n      allow read: if true;\n      allow create, update, delete: if isAdmin();\n    }\n\n    match /orders/{orderId} {\n      allow create: if isAdmin() || (signedIn() && request.resource.data.userId == request.auth.uid);\n      allow read: if isAdmin() || (signedIn() && resource.data.userId == request.auth.uid);\n      allow update, delete: if isAdmin();\n    }\n\n    match /customers/{customerId} {\n      allow create: if signedIn() && request.resource.data.uid == request.auth.uid;\n      allow read, update: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);\n      allow delete: if isAdmin();\n    }\n  }\n}\n","name":"firestore.rules"}]},"createTime":"2026-06-28T10:08:55.382607Z","metadata":{"services":["cloud.firestore"]}}
+[debug] [2026-06-28T10:08:54.970Z] [rules] created ruleset projects/chandrakala-bd6f8/rulesets/d4acbff7-f8c5-4e80-bf90-f9274122b290
+[debug] [2026-06-28T10:08:54.971Z] [rules] releasing cloud.firestore with ruleset projects/chandrakala-bd6f8/rulesets/d4acbff7-f8c5-4e80-bf90-f9274122b290
+[debug] [2026-06-28T10:08:54.971Z] Checked if tokens are valid: true, expires at: 1782644922658
+[debug] [2026-06-28T10:08:54.971Z] Checked if tokens are valid: true, expires at: 1782644922658
+[debug] [2026-06-28T10:08:54.971Z] >>> [apiv2][query] PATCH https://firebaserules.googleapis.com/v1/projects/chandrakala-bd6f8/releases/cloud.firestore [none]
+[debug] [2026-06-28T10:08:54.971Z] >>> [apiv2][body] PATCH https://firebaserules.googleapis.com/v1/projects/chandrakala-bd6f8/releases/cloud.firestore {"release":{"name":"projects/chandrakala-bd6f8/releases/cloud.firestore","rulesetName":"projects/chandrakala-bd6f8/rulesets/d4acbff7-f8c5-4e80-bf90-f9274122b290"}}
+[debug] [2026-06-28T10:08:56.389Z] <<< [apiv2][status] PATCH https://firebaserules.googleapis.com/v1/projects/chandrakala-bd6f8/releases/cloud.firestore 200
+[debug] [2026-06-28T10:08:56.389Z] <<< [apiv2][body] PATCH https://firebaserules.googleapis.com/v1/projects/chandrakala-bd6f8/releases/cloud.firestore {"name":"projects/chandrakala-bd6f8/releases/cloud.firestore","rulesetName":"projects/chandrakala-bd6f8/rulesets/d4acbff7-f8c5-4e80-bf90-f9274122b290","createTime":"2026-06-24T02:46:45.470249Z","updateTime":"2026-06-28T10:08:56.808876Z"}
+[debug] [2026-06-28T10:08:56.389Z] [rules] updated release projects/chandrakala-bd6f8/releases/cloud.firestore
+[info] +  firestore: released rules firestore.rules to cloud.firestore 
+[info] 
+[info] +  Deploy complete! 
+[info] 
+[info] Project Console: https://console.firebase.google.com/project/chandrakala-bd6f8/overview

@@ -98,7 +98,7 @@ const gallery = [
   "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=900&q=80"
 ];
 
-const navItems = ["Home", "Collections", "Gallery", "About", "Contact", "Cart", "Account", "Admin Login"];
+const navItems = ["Home", "Collections", "Gallery", "About", "Contact", "Cart", "Account"];
 const adminTabs = ["Dashboard", "Products", "Orders", "Messages", "Settings"];
 const adminEmail = "admin@chandrakala.com";
 
@@ -153,7 +153,7 @@ function SectionTitle({ eyebrow, title, children }) {
   );
 }
 
-function Header({ page, setPage, adminLoggedIn, userLoggedIn, cartCount }) {
+function Header({ page, setPage, userLoggedIn, cartCount }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const goTo = (item) => {
     setPage(item);
@@ -182,11 +182,6 @@ function Header({ page, setPage, adminLoggedIn, userLoggedIn, cartCount }) {
               )}
             </button>
           ))}
-          {adminLoggedIn && (
-            <button onClick={() => goTo("Admin")} className={`text-sm font-semibold hover:text-accent ${page === "Admin" ? "text-accent" : ""}`}>
-              Admin
-            </button>
-          )}
         </div>
         <a href={whatsappLink()} className="hidden rounded-full bg-accent px-5 py-2 text-sm font-bold text-dark md:inline-flex">
           WhatsApp
@@ -197,7 +192,7 @@ function Header({ page, setPage, adminLoggedIn, userLoggedIn, cartCount }) {
       </nav>
       {menuOpen && (
         <div className="grid gap-3 px-5 pb-5 text-white md:hidden">
-          {[...navItems, ...(adminLoggedIn ? ["Admin"] : [])].map((item) => (
+          {navItems.map((item) => (
             <button key={item} onClick={() => goTo(item)} className="text-left">
               {item === "Account" && userLoggedIn ? "My Orders" : item}
             </button>
@@ -253,10 +248,10 @@ function HomePage({ setPage, products, addToCart }) {
             Chandrakala Men's Wear & Uniform
           </p>
           <h1 className="max-w-4xl text-4xl font-extrabold leading-tight sm:text-6xl lg:text-7xl">
-            Premium fashion and online orders in Dhule.
+            Discover your next favourite look in Dhule.
           </h1>
           <p className="mt-5 max-w-2xl text-lg text-white/90 sm:text-2xl">
-            Shop sarees, kurtis, kids wear, men's wear and school uniforms with cart, checkout and payment-ready order flow.
+            Explore sarees, kurtis, dresses, kids wear and school uniforms — with easy WhatsApp ordering and local store support.
           </p>
           <div className="mt-8 flex flex-wrap gap-4">
             <button onClick={() => setPage("Collections")} className="rounded-full bg-primary px-7 py-3 font-bold text-white shadow-premium">
@@ -508,9 +503,9 @@ function AccountPage({ userLoggedIn, user, userOrders, setPage, customerLogin, l
   );
 }
 
-function AdminLoginPage({ adminLogin, setPage }) {
+export function AdminLoginPage({ adminLogin, setPage }) {
   const [email, setEmail] = useState("admin@chandrakala.com");
-  const [password, setPassword] = useState("123456");
+  const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -534,14 +529,14 @@ function AdminLoginPage({ adminLogin, setPage }) {
       <div>
         <p className="font-bold text-primary">Admin Login</p>
         <h1 className="mt-2 text-4xl font-extrabold sm:text-5xl">Manage products, uploads, orders and payments.</h1>
-        <p className="mt-4 text-slate-600">Admin login is connected through Firebase Auth. Admin email: admin@chandrakala.com.</p>
+        <p className="mt-4 text-slate-600">Private management access. Sign in with the authorized store administrator account.</p>
       </div>
       <form onSubmit={login} className="rounded-lg bg-white p-6 shadow-premium">
         <div className="mb-5 flex items-center gap-3">
           <div className="rounded-full bg-primary p-3 text-white"><LogIn /></div>
           <div>
             <h2 className="text-2xl font-extrabold">Admin Login Panel</h2>
-            <p className="text-sm text-slate-500">Demo admin access</p>
+            <p className="text-sm text-slate-500">Private administrator access</p>
           </div>
         </div>
         <input value={email} onChange={(event) => setEmail(event.target.value)} className="mb-4 w-full rounded-lg border border-slate-200 px-4 py-3 outline-primary" placeholder="Admin email" />
@@ -555,7 +550,7 @@ function AdminLoginPage({ adminLogin, setPage }) {
   );
 }
 
-function AdminPage({ products, orders, saveProduct, deleteProduct, uploadProductImage, updateOrderStatus, logoutUser, setPage }) {
+export function AdminPage({ products, orders, saveProduct, deleteProduct, uploadProductImage, updateOrderStatus, logoutUser, setPage }) {
   const [tab, setTab] = useState("Dashboard");
   const [form, setForm] = useState({ name: "", category: "Sarees", price: "", stock: "In Stock", image: categories[0].image });
   const [editingId, setEditingId] = useState(null);
@@ -915,8 +910,8 @@ function Footer() {
           <p className="mt-2 text-white/70">Home, Collections, Gallery, About, Contact, Cart</p>
         </div>
         <div>
-          <h3 className="font-bold">Portal</h3>
-          <p className="mt-2 text-white/70">User login, online order, payment gateway demo, admin management.</p>
+          <h3 className="font-bold">Shop Online</h3>
+          <p className="mt-2 text-white/70">Browse collections, add to cart and order directly through WhatsApp.</p>
         </div>
         <div>
           <h3 className="font-bold">Contact</h3>
@@ -931,7 +926,6 @@ function Footer() {
 
 function App() {
   const [page, setPage] = useState("Home");
-  const [adminLoggedIn, setAdminLoggedIn] = useState(false);
   const [userLoggedIn, setUserLoggedIn] = useState(false);
   const [authUser, setAuthUser] = useState(null);
   const [products, setProducts] = useState(initialProducts);
@@ -945,32 +939,21 @@ function App() {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setAuthUser(user);
       setUserLoggedIn(Boolean(user));
-      setAdminLoggedIn(user?.email === adminEmail);
     });
     return unsubscribe;
   }, []);
 
   useEffect(() => {
-    let seeded = false;
     const productsQuery = query(collection(db, "products"), orderBy("createdAt", "desc"));
     const unsubscribe = onSnapshot(
       productsQuery,
-      async (snapshot) => {
-        if (snapshot.empty && adminLoggedIn && !seeded) {
-          seeded = true;
-          await Promise.all(initialProducts.map(({ id, ...product }) => addDoc(collection(db, "products"), { ...product, createdAt: serverTimestamp() })));
-          return;
-        }
-        if (snapshot.empty) {
-          setProducts(initialProducts);
-          return;
-        }
-        setProducts(snapshot.docs.map((item) => ({ ...item.data(), id: item.id })));
+      (snapshot) => {
+        setProducts(snapshot.empty ? initialProducts : snapshot.docs.map((item) => ({ ...item.data(), id: item.id })));
       },
-      (error) => setFirebaseError(firebaseMessage(error))
+      () => setProducts(initialProducts)
     );
     return unsubscribe;
-  }, [adminLoggedIn]);
+  }, []);
 
   useEffect(() => {
     if (!authUser) {
@@ -1184,29 +1167,12 @@ function App() {
         />
       );
     }
-    if (page === "Admin Login") return <AdminLoginPage adminLogin={adminLogin} setPage={setPage} />;
-    if (page === "Admin") {
-      return adminLoggedIn ? (
-        <AdminPage
-          products={products}
-          orders={orders}
-          saveProduct={saveProduct}
-          deleteProduct={deleteProduct}
-          uploadProductImage={uploadProductImage}
-          updateOrderStatus={updateOrderStatus}
-          logoutUser={logoutUser}
-          setPage={setPage}
-        />
-      ) : (
-        <AdminLoginPage adminLogin={adminLogin} setPage={setPage} />
-      );
-    }
     return <HomePage setPage={setPage} products={products} addToCart={addToCart} />;
   };
 
   return (
     <div className="min-h-screen bg-soft pb-20 text-dark md:pb-0">
-      <Header page={page} setPage={setPage} adminLoggedIn={adminLoggedIn} userLoggedIn={userLoggedIn} cartCount={cartCount} />
+      <Header page={page} setPage={setPage} userLoggedIn={userLoggedIn} cartCount={cartCount} />
       {firebaseError && (
         <div className="fixed left-4 right-4 top-16 z-[70] mx-auto max-w-4xl rounded-lg bg-red-50 p-3 text-sm font-semibold text-red-700 shadow">
           Firebase: {firebaseError}
@@ -1232,7 +1198,7 @@ function App() {
         <button onClick={() => setPage("Home")} className="grid place-items-center gap-1"><Home size={19} />Home</button>
         <button onClick={() => setPage("Collections")} className="grid place-items-center gap-1"><ShoppingBag size={19} />Shop</button>
         <button onClick={() => setPage("Cart")} className="grid place-items-center gap-1"><CreditCard size={19} />Cart</button>
-        <button onClick={() => setPage("Admin")} className="grid place-items-center gap-1"><LayoutDashboard size={19} />Admin</button>
+
       </nav>
 
       {lightbox && (

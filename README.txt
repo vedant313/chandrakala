@@ -1,49 +1,22 @@
-CHANDRAKALA FASHION — COMPLETE E-COMMERCE PACKAGE
+CHANDRAKALA FASHION — ORIGINAL DESIGN / LOCAL COMPLETE VERSION
 
-CUSTOMER
-- index.html: polished storefront; no Admin link
-- Product catalogue, categories, gallery, cart, customer account, order history
-- COD checkout
-- Razorpay online checkout prepared end-to-end through Firebase Functions
-- WhatsApp, phone and Google Maps
+DESIGN
+- Original desktop layout preserved.
+- Mobile CSS only adjusts responsiveness; desktop hero proportions are unchanged.
 
 ADMIN
-- admin.html is a separate private entry
-- Product add/edit/delete + image upload
-- Gallery multi-upload + delete + reorder
-- Order list + status updates
-- Payment Gateway settings: enable/disable, Razorpay public Key ID, UPI ID
-- Store profile settings
+URL: /admin.html or /admin
+ID: admin@chandrakala.com
+Password: Chandra@1234
 
-FIREBASE SETUP
-1. Firebase Console > Authentication > Sign-in method > Email/Password ON.
-2. Create the admin account exactly: admin@chandrakala.com with your own strong password.
-3. Ensure Firestore and Storage are enabled.
-4. Install Firebase CLI on your PC if you don't already have it.
-5. In this folder run:
-   firebase login
-   firebase use chandrakala-bd6f8
-   firebase deploy --only firestore:rules,storage
-6. Install functions dependencies:
-   cd functions
-   npm install
-   cd ..
-7. Set Razorpay Secret securely (NEVER put it in frontend or Firestore):
-   firebase functions:secrets:set RAZORPAY_KEY_SECRET
-8. Deploy functions:
-   firebase deploy --only functions
-9. In admin.html > Payments, enable online payments and enter the Razorpay PUBLIC Key ID (rzp_test_... for testing or rzp_live_... for production).
-10. Deploy website:
-   firebase deploy --only hosting
+This version intentionally does NOT require npm, Firebase, or a database.
+Products, gallery, settings and orders are stored in browser localStorage.
 
-PAYMENT SECURITY
-Razorpay requires a server-side order before checkout and server-side signature verification. This package includes both Firebase callable functions. The secret is stored as a Firebase Functions secret, not in the browser. Do not paste the secret key into the admin panel. Razorpay live payments also require HTTPS and a properly configured live account.
+IMPORTANT LIMITATION
+Because this is local browser storage, admin changes are visible to the customer website only in the same browser/device. For a real multi-device live store, a server/database is required.
 
-LOCAL PREVIEW
-Because browser security can block ES modules on file://, use:
-  py -m http.server 8080
-then open http://localhost:8080/
-and http://localhost:8080/admin.html
+UPI / QR
+Admin > Payments lets you configure a UPI ID. Customers can use a UPI deep link or QR. The QR is generated from the UPI payment URI.
 
-IMPORTANT
-The Firebase web config is intended to be public. Security comes from Firebase Auth + Firestore/Storage rules. Change the admin password immediately and do not share it.
+DEPLOY TO VERCEL
+Deploy this folder as a static project. No build command is required.

@@ -1,73 +1,103 @@
 import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  orderBy,
+  query,
+  serverTimestamp,
+  updateDoc,
+} from "firebase/firestore";
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
-import { addDoc, collection, deleteDoc, doc, onSnapshot, orderBy, query, serverTimestamp, updateDoc } from "firebase/firestore";
-import { supabase } from "./supabase";
-import { auth, db } from "./firebase";
-import { AdminLoginPage, AdminPage } from "./App";
+import { AdminLoginPage, AdminPage, auth, db, supabase, initialProducts, initialOrders, adminEmail, firebaseMessage, parsePrice } from "./App.jsx";
 import "./index.css";
-
-const ADMIN_EMAIL = "admin@chandrakala.com";
-const fallbackProducts = [
-  { name: "Banarasi Silk Saree", category: "Sarees", price: "Rs. 2,499", stock: "In Stock", image: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=900&q=80" },
-  { name: "Designer Cotton Kurti", category: "Kurtis", price: "Rs. 799", stock: "In Stock", image: "https://images.unsplash.com/photo-1603217040830-34473db521a7?auto=format&fit=crop&w=900&q=80" },
-  { name: "Premium Party Dress", category: "Dresses", price: "Rs. 1,299", stock: "Limited", image: "https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&w=900&q=80" }
-];
-const fallbackOrders = [];
-const priceValue = (value) => Number(String(value).replace(/[^0-9]/g, "")) || 0;
 
 function AdminApp() {
   const [user, setUser] = useState(null);
-  const [ready, setReady] = useState(false);
-  const [products, setProducts] = useState(fallbackProducts.map((p, i) => ({ ...p, id: `demo-${i}` })));
-  const [orders, setOrders] = useState(fallbackOrders);
+  const [authReady, setAuthReady] = useState(false);
+  const [products, setProducts] = useState(initialProducts);
+  const [orders, setOrders] = useState(initialOrders);
   const [error, setError] = useState("");
 
-  useEffect(() => onAuthStateChanged(auth, (nextUser) => { setUser(nextUser); setReady(true); }), []);
+  useEffect(() => onAuthStateChanged(auth, (next) => {
+    setUser(next);
+    setAuthReady(true);
+  }), []);
 
   useEffect(() => {
-    if (!user || user.email !== ADMIN_EMAIL) return;
-    const unsubscribeProducts = onSnapshot(
-      query(collection(db, "products"), orderBy("createdAt", "desc")),
-      (snapshot) => setProducts(snapshot.empty ? fallbackProducts.map((p, i) => ({ ...p, id: `demo-${i}` })) : snapshot.docs.map((d) => ({ ...d.data(), id: d.id }))),
-      (err) => setError(err.message)
-    );
-    const unsubscribeOrders = onSnapshot(
-      query(collection(db, "orders"), orderBy("createdAt", "desc")),
-      (snapshot) => setOrders(snapshot.docs.map((d) => ({ ...d.data(), id: d.id }))),
-      (err) => setError(err.message)
-    );
-    return () => { unsubscribeProducts(); unsubscribeOrders(); };
+    if (!user || user.email !== adminEmail) return;
+    let seeded = false;
+    const q = query(collection(db, "products"), orderBy("createdAt", "desc"));
+    return onSnapshot(q, async (snapshot) => {
+      if (snapshot.empty && !seeded) {
+        seeded = true;
+        await Promise.all(initialProducts.map(({ id, ...product }) => addDoc(collection(db, "products"), {
+          ...product, priceValue: parsePrice(product.price), createdAt: serverTimestamp()
+        })));
+        return;
+      }
+      setProducts(snapshot.docs.map((item) => ({ ...item.data(), id: item.id })));
+    }, (e) => setError(firebaseMessage(e)));
   }, [user]);
 
-  const login = async (email, password) => {
-    if (email.trim().toLowerCase() !== ADMIN_EMAIL) throw new Error("This account is not authorized for the admin panel.");
-    await signInWithEmailAndPassword(auth, ADMIN_EMAIL, password);
+  useEffect(() => {
+    if (!user || user.email !== adminEmail) return;
+    const q = query(collection(db, "orders"), orderBy("createdAt", "desc"));
+    return onSnapshot(q, (snapshot) => {
+      setOrders(snapshot.docs.map((item) => ({ ...item.data(), id: item.id })));
+    }, (e) => setError(firebaseMessage(e)));
+  }, [user]);
+
+  const adminLogin = async (email, password) => {
+    if (email !== adminEmail) throw new Error(`Please use ${adminEmail} for admin login.`);
+    return signInWithEmailAndPassword(auth, email, password);
   };
-  const logout = async () => { await signOut(auth); };
-  const saveProduct = async (product, id = null) => {
-    if (id && String(id).startsWith("demo-")) throw new Error("Demo products are read-only until real products are added from the admin panel.");
-    const payload = { name: product.name.trim(), category: product.category, price: product.price.trim(), stock: product.stock, image: product.image, priceValue: priceValue(product.price), updatedAt: serverTimestamp() };
-    if (id) return updateDoc(doc(db, "products", String(id)), payload);
-    return addDoc(collection(db, "products"), { ...payload, createdAt: serverTimestamp() });
+
+  const logoutUser = async () => {
+    await signOut(auth);
+    window.location.href = "/";
   };
-  const deleteProduct = async (id) => {
-    if (String(id).startsWith("demo-")) throw new Error("Demo products cannot be deleted.");
-    return deleteDoc(doc(db, "products", String(id)));
+
+  const saveProduct = async (product, productId = null) => {
+    const payload = {
+      name: product.name.trim(),
+      category: product.category,
+      price: product.price.trim(),
+      stock: product.stock,
+      image: product.image,
+      priceValue: parsePrice(product.price),
+      updatedAt: serverTimestamp(),
+    };
+    if (!payload.name || !payload.price || !payload.image) throw new Error("Product name, price and image are required.");
+    if (productId) await updateDoc(doc(db, "products", String(productId)), payload);
+    else await addDoc(collection(db, "products"), { ...payload, createdAt: serverTimestamp() });
   };
+
+  const deleteProduct = async (id) => deleteDoc(doc(db, "products", String(id)));
+
   const uploadProductImage = async (file) => {
     const extension = file.name.split(".").pop()?.toLowerCase() || "jpg";
-    const safe = file.name.replace(/\.[^/.]+$/, "").toLowerCase().replace(/[^a-z0-9-]+/g, "-") || "product";
-    const path = `products/${Date.now()}-${safe}.${extension}`;
-    const { error: uploadError } = await supabase.storage.from("chandrakala").upload(path, file, { cacheControl: "3600", upsert: false });
+    const safeName = file.name.replace(/\.[^/.]+$/, "").toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/^-+|-+$/g, "") || "product";
+    const fileName = `products/${Date.now()}-${safeName}.${extension}`;
+    const { error: uploadError } = await supabase.storage.from("chandrakala").upload(fileName, file, { cacheControl: "3600", upsert: false });
     if (uploadError) throw new Error(`Image upload failed: ${uploadError.message}`);
-    return supabase.storage.from("chandrakala").getPublicUrl(path).data.publicUrl;
+    const { data } = supabase.storage.from("chandrakala").getPublicUrl(fileName);
+    if (!data?.publicUrl) throw new Error("Could not create a public image URL.");
+    return data.publicUrl;
   };
-  const updateOrderStatus = (id, status) => updateDoc(doc(db, "orders", String(id)), { status, updatedAt: serverTimestamp() });
 
-  if (!ready) return <div className="grid min-h-screen place-items-center bg-soft p-6"><div className="rounded-2xl bg-white p-8 shadow-premium font-bold">Loading secure admin…</div></div>;
-  if (!user || user.email !== ADMIN_EMAIL) return <AdminLoginPage adminLogin={login} setPage={() => {}} />;
-  return <><AdminPage products={products} orders={orders} saveProduct={saveProduct} deleteProduct={deleteProduct} uploadProductImage={uploadProductImage} updateOrderStatus={updateOrderStatus} logoutUser={logout} setPage={() => {}} />{error && <div className="fixed bottom-4 left-4 right-4 mx-auto max-w-3xl rounded-xl bg-red-50 p-4 text-sm font-semibold text-red-700 shadow-lg">{error}</div>}</>;
+  const updateOrderStatus = async (id, status) => updateDoc(doc(db, "orders", String(id)), { status, updatedAt: serverTimestamp() });
+
+  if (!authReady) return <div className="grid min-h-screen place-items-center bg-soft"><div className="rounded-2xl bg-white p-8 shadow-premium"><p className="font-bold">Loading secure admin...</p></div></div>;
+
+  if (!user || user.email !== adminEmail) {
+    return <><AdminLoginPage adminLogin={adminLogin} setPage={() => {}} />{error && <div className="fixed bottom-4 left-4 right-4 mx-auto max-w-xl rounded-xl bg-red-50 p-4 text-sm font-semibold text-red-700">{error}</div>}</>;
+  }
+
+  return <><AdminPage products={products} orders={orders} saveProduct={saveProduct} deleteProduct={deleteProduct} uploadProductImage={uploadProductImage} updateOrderStatus={updateOrderStatus} logoutUser={logoutUser} setPage={() => {}} />{error && <div className="fixed bottom-4 left-4 right-4 mx-auto max-w-xl rounded-xl bg-red-50 p-4 text-sm font-semibold text-red-700">{error}</div>}</>;
 }
 
-createRoot(document.getElementById("root")).render(<AdminApp />);
+createRoot(document.getElementById("root")).render(<React.StrictMode><AdminApp /></React.StrictMode>);

@@ -31,7 +31,6 @@ import {
   Heart,
   Home,
   ImagePlus,
-  LayoutDashboard,
   LogIn,
   LogOut,
   MapPin,
@@ -248,10 +247,10 @@ function HomePage({ setPage, products, addToCart }) {
             Chandrakala Men's Wear & Uniform
           </p>
           <h1 className="max-w-4xl text-4xl font-extrabold leading-tight sm:text-6xl lg:text-7xl">
-            Discover your next favourite look in Dhule.
+            Premium fashion and online orders in Dhule.
           </h1>
           <p className="mt-5 max-w-2xl text-lg text-white/90 sm:text-2xl">
-            Explore sarees, kurtis, dresses, kids wear and school uniforms — with easy WhatsApp ordering and local store support.
+            Shop sarees, kurtis, kids wear, men's wear and school uniforms with cart, checkout and payment-ready order flow.
           </p>
           <div className="mt-8 flex flex-wrap gap-4">
             <button onClick={() => setPage("Collections")} className="rounded-full bg-primary px-7 py-3 font-bold text-white shadow-premium">
@@ -427,7 +426,7 @@ function CartPage({ cart, updateQty, removeFromCart, clearCart, userLoggedIn, se
 }
 
 function AccountPage({ userLoggedIn, user, userOrders, setPage, customerLogin, logoutUser }) {
-  const [form, setForm] = useState({ name: "Customer", phone: "9370017895", email: "customer@chandrakala.com", password: "123456" });
+  const [form, setForm] = useState({ name: "", phone: "", email: "", password: "" });
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -529,14 +528,14 @@ export function AdminLoginPage({ adminLogin, setPage }) {
       <div>
         <p className="font-bold text-primary">Admin Login</p>
         <h1 className="mt-2 text-4xl font-extrabold sm:text-5xl">Manage products, uploads, orders and payments.</h1>
-        <p className="mt-4 text-slate-600">Private management access. Sign in with the authorized store administrator account.</p>
+        <p className="mt-4 text-slate-600">Authorized store staff only. Sign in with the admin account created in Firebase Authentication.</p>
       </div>
       <form onSubmit={login} className="rounded-lg bg-white p-6 shadow-premium">
         <div className="mb-5 flex items-center gap-3">
           <div className="rounded-full bg-primary p-3 text-white"><LogIn /></div>
           <div>
             <h2 className="text-2xl font-extrabold">Admin Login Panel</h2>
-            <p className="text-sm text-slate-500">Private administrator access</p>
+            <p className="text-sm text-slate-500">Secure staff access</p>
           </div>
         </div>
         <input value={email} onChange={(event) => setEmail(event.target.value)} className="mb-4 w-full rounded-lg border border-slate-200 px-4 py-3 outline-primary" placeholder="Admin email" />
@@ -880,13 +879,18 @@ function ContactPage() {
           </a>
         </div>
       </div>
-      <form className="rounded-lg bg-white p-6 shadow-premium">
+      <form onSubmit={(event) => {
+        event.preventDefault();
+        const data = new FormData(event.currentTarget);
+        const text = `Hello Chandrakala Fashion Store,\nName: ${data.get("name")}\nPhone: ${data.get("phone")}\nMessage: ${data.get("message")}`;
+        window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, "_blank");
+      }} className="rounded-lg bg-white p-6 shadow-premium">
         <h2 className="mb-5 text-2xl font-extrabold">Contact Us</h2>
-        <input className="mb-4 w-full rounded-lg border border-slate-200 px-4 py-3 outline-primary" placeholder="Name" />
-        <input className="mb-4 w-full rounded-lg border border-slate-200 px-4 py-3 outline-primary" placeholder="Phone" />
-        <textarea className="mb-4 min-h-36 w-full rounded-lg border border-slate-200 px-4 py-3 outline-primary" placeholder="Message" />
-        <button type="button" className="w-full rounded-full bg-primary px-6 py-3 font-bold text-white">
-          Submit
+        <input name="name" className="mb-4 w-full rounded-lg border border-slate-200 px-4 py-3 outline-primary" placeholder="Name" required />
+        <input name="phone" className="mb-4 w-full rounded-lg border border-slate-200 px-4 py-3 outline-primary" placeholder="Phone" required />
+        <textarea name="message" className="mb-4 min-h-36 w-full rounded-lg border border-slate-200 px-4 py-3 outline-primary" placeholder="How can we help?" required />
+        <button type="submit" className="w-full rounded-full bg-primary px-6 py-3 font-bold text-white">
+          Send on WhatsApp
         </button>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           <a href={`tel:+${phone}`} className="rounded-full bg-dark px-6 py-3 text-center font-bold text-white">Call</a>
@@ -910,8 +914,8 @@ function Footer() {
           <p className="mt-2 text-white/70">Home, Collections, Gallery, About, Contact, Cart</p>
         </div>
         <div>
-          <h3 className="font-bold">Shop Online</h3>
-          <p className="mt-2 text-white/70">Browse collections, add to cart and order directly through WhatsApp.</p>
+          <h3 className="font-bold">Portal</h3>
+          <p className="mt-2 text-white/70">User login, online order, payment gateway demo, admin management.</p>
         </div>
         <div>
           <h3 className="font-bold">Contact</h3>
@@ -926,6 +930,7 @@ function Footer() {
 
 function App() {
   const [page, setPage] = useState("Home");
+  const [adminLoggedIn, setAdminLoggedIn] = useState(false);
   const [userLoggedIn, setUserLoggedIn] = useState(false);
   const [authUser, setAuthUser] = useState(null);
   const [products, setProducts] = useState(initialProducts);
@@ -939,21 +944,32 @@ function App() {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setAuthUser(user);
       setUserLoggedIn(Boolean(user));
+      setAdminLoggedIn(user?.email === adminEmail);
     });
     return unsubscribe;
   }, []);
 
   useEffect(() => {
+    let seeded = false;
     const productsQuery = query(collection(db, "products"), orderBy("createdAt", "desc"));
     const unsubscribe = onSnapshot(
       productsQuery,
-      (snapshot) => {
-        setProducts(snapshot.empty ? initialProducts : snapshot.docs.map((item) => ({ ...item.data(), id: item.id })));
+      async (snapshot) => {
+        if (snapshot.empty && adminLoggedIn && !seeded) {
+          seeded = true;
+          await Promise.all(initialProducts.map(({ id, ...product }) => addDoc(collection(db, "products"), { ...product, createdAt: serverTimestamp() })));
+          return;
+        }
+        if (snapshot.empty) {
+          setProducts(initialProducts);
+          return;
+        }
+        setProducts(snapshot.docs.map((item) => ({ ...item.data(), id: item.id })));
       },
-      () => setProducts(initialProducts)
+      (error) => setFirebaseError(firebaseMessage(error))
     );
     return unsubscribe;
-  }, []);
+  }, [adminLoggedIn]);
 
   useEffect(() => {
     if (!authUser) {
@@ -1039,14 +1055,7 @@ function App() {
     if (email !== adminEmail) {
       throw new Error(`Please use ${adminEmail} for admin login.`);
     }
-    try {
-      return await signInWithEmailAndPassword(auth, email, password);
-    } catch (error) {
-      if (!["auth/user-not-found", "auth/invalid-credential"].includes(error.code)) {
-        throw error;
-      }
-      return createUserWithEmailAndPassword(auth, email, password);
-    }
+    return signInWithEmailAndPassword(auth, email, password);
   };
 
   const logoutUser = () => {
@@ -1194,11 +1203,10 @@ function App() {
         </button>
       </div>
 
-      <nav className="fixed bottom-0 left-0 right-0 z-40 grid grid-cols-4 bg-white px-2 py-2 text-center text-xs font-semibold shadow-2xl md:hidden">
+      <nav className="fixed bottom-0 left-0 right-0 z-40 grid grid-cols-3 bg-white px-2 py-2 text-center text-xs font-semibold shadow-2xl md:hidden">
         <button onClick={() => setPage("Home")} className="grid place-items-center gap-1"><Home size={19} />Home</button>
         <button onClick={() => setPage("Collections")} className="grid place-items-center gap-1"><ShoppingBag size={19} />Shop</button>
         <button onClick={() => setPage("Cart")} className="grid place-items-center gap-1"><CreditCard size={19} />Cart</button>
-
       </nav>
 
       {lightbox && (
@@ -1211,3 +1219,5 @@ function App() {
 }
 
 export default App;
+
+export { auth, db, supabase, initialProducts, initialOrders, categories, adminEmail, firebaseMessage, parsePrice };

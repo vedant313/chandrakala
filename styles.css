@@ -9,3 +9,7 @@
 /* Final editorial refinements */
 .hero-copy .container{max-width:600px}.section-head{padding-top:4px}.section-head h2{letter-spacing:-.02em}.category,.product,.benefit,.contact-card{box-shadow:0 8px 28px rgba(17,19,24,.045)}.hero-photo{background-color:#e9e5de}
 @media(max-width:900px){.nav-links.mobile-open{display:flex;position:absolute;left:0;right:0;top:100%;background:#fff;border-bottom:1px solid var(--line);padding:14px 5%;flex-direction:column;gap:14px}.nav{position:relative}.nav-inner{position:relative}.mobile-toggle{display:grid!important}.nav-actions .icon-btn:first-child{display:none!important}}
+
+/* Hero image fix: keep the full source image visible instead of zooming/cropping it. */
+.hero-photo{background-size:contain;background-repeat:no-repeat;background-position:center center}
+@media(max-width:900px){.hero-photo{background-size:cover;background-position:center center}}
